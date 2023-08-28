@@ -16,3 +16,14 @@ Return randomId.ToString
 =VB.NET.TOPLEVEL(A1)
 ```
 Press Enter to run the formula function. It generates a random GUID.
+
+### Run top-level code with parameters with `VB.NET.FUNCTION` function
+1. Set value of A1 to the following value:
+```vbnet
+Return a+b
+```
+2. Set formula of B1 to the following value:
+```
+=VB.NET.FUNCTION(A1, "a", 100, "b", 200)
+```
+Press Enter to run the formula function. It returns 300.

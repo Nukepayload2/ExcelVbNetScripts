@@ -6,9 +6,18 @@
     <NoWarn></NoWarn>
   </PropertyGroup>
 
+  <!-- Available since ExcelDna 1.7.0 -->
+  <PropertyGroup>
+    <!-- Prevents automatic registration of functions and commands. -->
+    <ExcelAddInExplicitRegistration>true</ExcelAddInExplicitRegistration>
+    <!-- Prevents every static public function from becomming a UDF, they will need an explicit [ExcelFunction] annotation. -->
+    <ExcelAddInExplicitExports>true</ExcelAddInExplicitExports>
+  </PropertyGroup>
+  
   <ItemGroup>
-    <PackageReference Include="ExcelDna.AddIn" Version="1.6.0" />
-    <PackageReference Include="ExcelDna.Registration.VisualBasic" Version="1.6.0" />
+    <PackageReference Include="ExcelDna.AddIn" Version="1.7.0-rc6" />
+    <PackageReference Include="ExcelDna.IntelliSense" Version="1.7.0-rc6" />
+    <PackageReference Include="ExcelDna.Registration" Version="1.7.0-rc6" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.7.0" />
   </ItemGroup>
 

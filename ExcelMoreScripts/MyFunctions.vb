@@ -4,7 +4,10 @@ Imports ExcelDna.Registration.Utils
 Public Module MyFunctions
 
     <ExcelFunction(Description:="Run Visual Basic .NET code snippet", Name:="VB.NET.TOPLEVEL")>
-    Public Function RunVbNetTopLevel(code As String) As Object
+    Public   Function RunVbNetTopLevel(
+        <ExcelArgument(Name:="code", Description:="Code that is a function body. It must have a return statement.")>
+        code As String) As Object
+
         Dim vbCodeFull As String = $"
     Imports System
 
@@ -23,7 +26,7 @@ Public Module MyFunctions
 
     <ExcelFunction(Description:="Run Visual Basic .NET function", Name:="VB.NET.FUNCTION")>
     Public Function RunVbNetFunction(
-        <ExcelArgument(Name:="code", Description:="Code that accepts function")>
+        <ExcelArgument(Name:="code", Description:="Code that is a function body. It must have a return statement.")>
         code As String,
         <ExcelArgument(Name:="parameterNameAndValuePair", Description:="paramName1, paramValue1, paramName2, paramValue2, ...")>
         ParamArray parameterNameAndValuePair As Object()) As Object
@@ -48,7 +51,6 @@ Public Module MyFunctions
     End Class
 "
 
-        ' TODO: https://github.com/Excel-DNA/Registration/issues/25
         Dim returnValue = AsyncTaskUtil.RunAsTask(NameOf(RunVbNetFunction), {CObj(code), parameterNameAndValuePair},
             Function() CompilerHelper.CompileAndRunVbCode(vbCodeFull, "Main", argValueList.ToArray))
 
