@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>ExcelMoreScripts</RootNamespace>
+    <TargetFramework>net6.0-windows7.0</TargetFramework>
+    <NoWarn></NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ExcelDna.AddIn" Version="1.6.0" />
+    <PackageReference Include="ExcelDna.Registration.VisualBasic" Version="1.6.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.7.0" />
+  </ItemGroup>
+
+</Project>
