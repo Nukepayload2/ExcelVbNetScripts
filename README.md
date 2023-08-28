@@ -22,8 +22,16 @@ Press Enter to run the formula function. It generates a random GUID.
 ```vbnet
 Return a+b
 ```
-2. Set formula of B1 to the following value:
+2. Set value of A2 to the following value:
+```vbnet
+100
 ```
-=VB.NET.FUNCTION(A1, "a", 100, "b", 200)
+3. Set value of A3 to the following value:
+```vbnet
+200
+```
+4. Set formula of B1 to the following value:
+```
+=VB.NET.FUNCTION(A1, "a", A2, "b", A3)
 ```
 Press Enter to run the formula function. It returns 300.
