@@ -122,6 +122,21 @@ The first part will be placed at the beginning of the template.
 
 The second part will become the body of a function. The function will be invoked later.
 
+### #R directive
+**Important: This feature is not implemented at this time.**
+
+#### Assembly reference
+Adds assembly references in your code snippet. For example, `#R "WindowsBase.dll"` will search for the `WindowsBase.dll` in the current assembly load context and let your code snippet reference it.
+
+#### File reference
+Adds a VB source file to the project of your code snippet. For example, `#R "C:\Program.vb"` will add `C:\Program.vb` to your code snippet's project.
+
+#### NuGet package reference
+Adds a NuGet package to the project of your code snippet. For example, `#R NuGet "System.Runtime.CompilerServices.Unsafe"` will add NuGet package `System.Runtime.CompilerServices.Unsafe` to your code snippet's project.
+
+#### Restrictions
+It must be placed before any `Option` or `Imports` statements.
+
 ## Limitations
 ### Top-level code is based on text transformation
 The current implementation of "top-level code" is not based on VB language features. It's based on text transformation in formula functions. Although it supports the `Imports` statement at the beginning of the code, it could have unexpected behavior when the code contains preprocessor directives before `Imports` statements.
