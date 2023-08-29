@@ -1,19 +1,29 @@
-Imports System.IO
 Imports ExcelDna.Integration
 Imports ExcelDna.Registration.Utils
 
 Public Module MyFunctions
 
     ' TODO: Make a project UI
-    Private ReadOnly s_defaultImports As String = "Imports System
+    Private ReadOnly s_defaultImports As String = "Imports Microsoft.VisualBasic
+Imports System
+Imports System.Collections
+Imports System.Collections.Generic
+Imports System.Diagnostics
+Imports System.Linq
+Imports System.Xml.Linq
+Imports System.Threading.Tasks
+' Added some additional imports based on Excel built-in functions
 Imports System.IO
-Imports Microsoft.VisualBasic"
+Imports System.Text
+Imports System.Text.RegularExpressions
+Imports System.Numerics"
 
+    ' TODO: Automatically convert pointed cell to rich text and colorize with Roslyn
     <ExcelFunction(Description:="Run Visual Basic .NET function", Name:="VB.NET.FUNCTION")>
     Public Function RunVbNetFunction(
         <ExcelArgument(Name:="code", Description:="Code that is a function body. It must have a return statement.")>
         code As String,
-        <ExcelArgument(Name:="parameterNameAndValuePairs",
+        <ExcelArgument(Name:="parameterNameAndValuePair",
                        Description:="Optionally populates parameters for this function. Order: paramName1, paramValue1, paramName2, paramValue2, ...")>
         ParamArray parameterNameAndValuePairs As Object()) As Object
 
@@ -21,14 +31,15 @@ Imports Microsoft.VisualBasic"
             Return "ERROR: Incorrect parameter count"
         End If
 
+        Dim splittedCode = SplitTopAndBodyLines(code)
+
         Dim argList = ExtractArgList(parameterNameAndValuePairs)
 
-        Dim vbCodeFull As String = $"
+        Dim vbCodeFull As String = $"{splittedCode.topLines}
 {s_defaultImports}
-
     Public Class Program
         Public Shared Function Main({String.Join(",", argList.argNameList)}) As Object
-{code}
+{splittedCode.bodyLines}
         End Function
     End Class
 "
@@ -53,7 +64,7 @@ Imports Microsoft.VisualBasic"
     Public Function RunVbNetAsyncFunction(
         <ExcelArgument(Name:="code", Description:="Code that is a async function body. It must have a return statement.")>
         code As String,
-        <ExcelArgument(Name:="parameterNameAndValuePairs",
+        <ExcelArgument(Name:="parameterNameAndValuePair",
                        Description:="Optionally populates parameters for this function. Order: paramName1, paramValue1, paramName2, paramValue2, ...")>
         ParamArray parameterNameAndValuePairs As Object()) As Object
 
@@ -61,15 +72,15 @@ Imports Microsoft.VisualBasic"
             Return "ERROR: Incorrect parameter count"
         End If
 
+        Dim splittedCode = SplitTopAndBodyLines(code)
+
         Dim argList = ExtractArgList(parameterNameAndValuePairs)
 
-        Dim vbCodeFull As String = $"
+        Dim vbCodeFull As String = $"{splittedCode.topLines}
 {s_defaultImports}
-    Imports System.Threading.Tasks
-
     Public Class Program
         Public Shared Async Function MainAsync({String.Join(",", argList.argNameList)}) As Task(Of Object)
-{code}
+{splittedCode.bodyLines}
         End Function
     End Class
 "
@@ -86,6 +97,22 @@ Imports Microsoft.VisualBasic"
             End Function)
 
         Return returnValue
+    End Function
+
+    Private Function SplitTopAndBodyLines(code As String) As (topLines As String, bodyLines As String)
+        Dim splitted = code.Split(vbLf)
+        Dim topLines =
+            (From ln In splitted
+             Let trimmed = ln.TrimStart
+             Take While String.IsNullOrEmpty(trimmed) OrElse ' Has nothing
+                        trimmed.StartsWith("'"c) OrElse ' Comment
+                        trimmed.StartsWith("REM ", StringComparison.OrdinalIgnoreCase) OrElse ' Comment
+                        trimmed.StartsWith("Imports ", StringComparison.OrdinalIgnoreCase) OrElse
+                        trimmed.StartsWith("Option ", StringComparison.OrdinalIgnoreCase)
+             Select ln).ToArray
+
+        Dim bodyLines = String.Join(Environment.NewLine, splitted.Skip(topLines.Length))
+        Return (String.Join(Environment.NewLine, topLines), bodyLines)
     End Function
 
 End Module
