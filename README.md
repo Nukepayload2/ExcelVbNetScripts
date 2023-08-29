@@ -20,18 +20,22 @@ Press Enter to run the formula function. It generates a random GUID.
 ### Run top-level code with parameters with `VB.NET.FUNCTION` function
 1. Set value of A1 to the following value:
 ```vbnet
-Return a+b
+Return System.Text.RegularExpressions.Regex.Replace(lookIn,findWhat,replacement)
 ```
 2. Set value of A2 to the following value:
-```vbnet
-100
+```
+Excel can run Python.
 ```
 3. Set value of A3 to the following value:
-```vbnet
-200
 ```
-4. Set formula of B1 to the following value:
+(?<=run )\w+
 ```
-=VB.NET.FUNCTION(A1, "a", A2, "b", A3)
+4. Set value of A4 to the following value:
 ```
-Press Enter to run the formula function. It returns 300.
+VB.NET
+```
+5. Set formula of A5 to the following value:
+```
+=VB.NET.FUNCTION(A1, "lookIn", A2, "findWhat", A3, "replacement", A4)
+```
+Press Enter to run the formula function. It returns `Excel can run VB.NET.`.
