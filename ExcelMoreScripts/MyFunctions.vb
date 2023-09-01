@@ -1,4 +1,4 @@
-Imports ExcelDna.Integration
+﻿Imports ExcelDna.Integration
 Imports ExcelDna.Registration.Utils
 
 Public Module MyFunctions
@@ -90,7 +90,11 @@ Imports System.Numerics"
                 Dim runResult = CompilerHelper.CompileAndRunVbCode(vbCodeFull, "MainAsync", argList.argValueList.ToArray)
                 Dim taskResult = TryCast(runResult, Task(Of Object))
                 If taskResult IsNot Nothing Then
-                    Return Await taskResult
+                    Try
+                        Return Await taskResult
+                    Catch ex As Exception
+                        Return CompilerHelper.FormatRuntimeException(ex)
+                    End Try
                 Else
                     Return runResult
                 End If
