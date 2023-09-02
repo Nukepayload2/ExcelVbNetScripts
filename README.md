@@ -70,6 +70,7 @@ Imports System.Threading.Tasks
 Imports System.IO
 Imports System.Text
 Imports System.Text.RegularExpressions
+Imports System.Text.Json.Nodes
 Imports System.Numerics
 ```
 
@@ -85,9 +86,13 @@ Option Infer On
 .NET 6.0 for Windows Desktop
 
 ### Referenced assemblies
-All assemblies loaded by this plugin. We plan to add all assemblies in the Windows Desktop SDK.
+Assemblies of the VB console app workload will be referenced by your script. 
+
+We plan to add all assemblies in the Windows Desktop SDK with some special syntaxes or settings.
 
 ## Special syntaxes
+The VB used by this plugin is a scripting dialect.
+
 ### Top-level code
 Your code will be splitted into 2 parts, then transform into a regular VB source snippet for running. 
 1. Options and imports.
@@ -122,24 +127,46 @@ The first part will be placed at the beginning of the template.
 
 The second part will become the body of a function. The function will be invoked later.
 
+#### Dealing with parameters
+Your script can accept parameters passed by callers. To reduce compilation time, each parameter is an `Object`. You'll need to convert them to your expected types before using them.
+
 ### #R directive
 **Important: This feature is not implemented at this time.**
 
 #### Assembly reference
-Adds assembly references in your code snippet. For example, `#R "WindowsBase.dll"` will search for the `WindowsBase.dll` in the current assembly load context and let your code snippet reference it.
+Adds assembly references in your code snippet. 
+
+For example, `#R Assembly "WindowsBase.dll"` will search for the `WindowsBase.dll` in the current assembly load context and let your code snippet reference it.
 
 #### File reference
-Adds a VB source file to the project of your code snippet. For example, `#R "C:\Program.vb"` will add `C:\Program.vb` to your code snippet's project.
+Adds a VB source file to the project of your code snippet. 
+
+For example, `#R Source "C:\Program.vb"` will add `C:\Program.vb` to your code snippet's project.
 
 #### NuGet package reference
-Adds a NuGet package to the project of your code snippet. For example, `#R NuGet "System.Runtime.CompilerServices.Unsafe"` will add NuGet package `System.Runtime.CompilerServices.Unsafe` to your code snippet's project.
+Adds a NuGet package to the project of your code snippet. 
+
+For example, `#R NuGet "System.Runtime.CompilerServices.Unsafe"` will add NuGet package `System.Runtime.CompilerServices.Unsafe` to your code snippet's project.
+
+#### Workload reference
+This feature is used to reference Windows Desktop assemblies.
+- `#R Workload "Windows Forms"` references Windows Forms.
+- `#R Workload "WPF"` references Windows Presentation Foundation.
+- WinUI is not supported, because it requires adding dynamically compiled Windows RT resources and source generators to your script.
 
 #### Restrictions
 It must be placed before any `Option` or `Imports` statements.
 
+## Caching strategy
+We cache up to `100` assemblies for each different script. 
+
+When the cache is full, it removes the least recently used script and unloads the assembly load context.
+
+Based on this strategy, we recommend using parameters in your script instead of dynamically generating code.
+
 ## Limitations
-### Top-level code is based on text transformation
-The current implementation of "top-level code" is not based on VB language features. It's based on text transformation in formula functions. Although it supports the `Imports` statement at the beginning of the code, it could have unexpected behavior when the code contains preprocessor directives before `Imports` statements.
+### Special syntaxes are based on text transformation
+The current implementation of special syntaxes are not based on VB language features. It's based on text transformation in formula functions. Although it supports the `Imports` statement at the beginning of the code, it could have unexpected behavior when the code contains preprocessor directives before `Imports` statements. Line numbers and text spans of the source code are also broken.
 
 Resolution:
-Switch to ModVB when it supports top-level code.
+Switch to ModVB when it supports these syntaxes.

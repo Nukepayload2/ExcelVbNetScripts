@@ -17,8 +17,7 @@ Imports System.IO
 Imports System.Text
 Imports System.Text.RegularExpressions
 Imports System.Text.Json.Nodes
-Imports System.Numerics
-Imports System.Reflection"
+Imports System.Numerics"
 
     ' TODO: Automatically convert pointed cell to rich text and colorize with Roslyn
     <ExcelFunction(Description:="Run Visual Basic .NET function", Name:="VB.NET.FUNCTION")>
