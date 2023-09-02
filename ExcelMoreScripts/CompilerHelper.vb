@@ -1,14 +1,23 @@
 ﻿Imports System.IO
 Imports System.Reflection
 Imports System.Runtime.CompilerServices
+Imports System.Runtime.Loader
 Imports Microsoft.CodeAnalysis
 Imports Microsoft.CodeAnalysis.VisualBasic
 
 Public Class CompilerHelper
     Private Shared s_commonCompilation As VisualBasicCompilation
 
-    ' TODO: Clean this cache when the key is not in use.
-    Private Shared ReadOnly s_codeToAssemblyCache As New Dictionary(Of String, Assembly)
+    ' TODO: Set max size from settings UI.
+    Private Shared WithEvents CodeToAssemblyCache As New LruCache(Of String, Assembly)(100)
+
+    Private Shared Sub CodeToAssemblyCache_ItemAutoRemoved(sender As LruCache(Of String, Assembly), e As Assembly) Handles CodeToAssemblyCache.ItemAutoRemoved
+        Dim context = AssemblyLoadContext.GetLoadContext(e)
+        If context.IsCollectible Then
+            Debug.WriteLine("Unload assembly " & context.Name)
+            context.Unload()
+        End If
+    End Sub
 
     Public Shared Function CompileAndRunVbCode(codeSnippet As String, methodName As String, args As Object()) As Object
         Dim failMessage As String = Nothing
@@ -20,9 +29,8 @@ Public Class CompilerHelper
         Dim entryPoint As MethodInfo = FindMethodInAssembly(cachedAssembly, methodName)
 
         If entryPoint IsNot Nothing Then
-            Dim declaringTypeInstance = Activator.CreateInstance(entryPoint.DeclaringType)
             Try
-                Dim returnValue = entryPoint.Invoke(declaringTypeInstance, args)
+                Dim returnValue = entryPoint.Invoke(Nothing, args)
                 Return returnValue
             Catch ex As Exception
                 Return FormatRuntimeException(ex)
@@ -42,39 +50,38 @@ Public Class CompilerHelper
     <MethodImpl(MethodImplOptions.Synchronized)>
     Private Shared Function CompileOrGetCachedAssembly(codeSnippet As String, ByRef failMessage As String) As Assembly
         Dim cachedAssembly As Assembly = Nothing
-        If Not s_codeToAssemblyCache.TryGetValue(codeSnippet, cachedAssembly) Then
+        If Not CodeToAssemblyCache.TryGetValue(codeSnippet, cachedAssembly) Then
             cachedAssembly = CompileAssembly(codeSnippet, failMessage)
             If cachedAssembly Is Nothing Then
                 Return Nothing
             Else
-                s_codeToAssemblyCache(codeSnippet) = cachedAssembly
+                CodeToAssemblyCache(codeSnippet) = cachedAssembly
+                Debug.WriteLine($"New assembly ({CodeToAssemblyCache.Count}/{CodeToAssemblyCache.Capacity}) " &
+                                AssemblyLoadContext.GetLoadContext(cachedAssembly).Name)
             End If
+        Else
+            Debug.WriteLine($"Use cached assembly ({CodeToAssemblyCache.Count}/{CodeToAssemblyCache.Capacity}) " &
+                            AssemblyLoadContext.GetLoadContext(cachedAssembly).Name)
         End If
 
         Return cachedAssembly
     End Function
 
     Private Shared Function CreateCompilation() As VisualBasicCompilation
-        LoadCommonlyUsedLibs()
-        Dim systemReferences =
-            From asm In AppDomain.CurrentDomain.GetAssemblies()
-            Where Not asm.IsDynamic
-            Let loc = asm.Location
-            Where File.Exists(loc)
-            Select MetadataReference.CreateFromFile(asm.Location)
-        Dim references = systemReferences
+        Dim commonAssemblyLocations =
+            From dll In Directory.GetFiles(Path.GetDirectoryName(GetType(Object).Assembly.Location), "*.dll")
+            Let fn = Path.GetFileNameWithoutExtension(dll)
+            Where fn.Contains("System") OrElse fn.Contains("Microsoft") OrElse fn = "WindowsBase"
+            Where Not fn.Contains("Native")
+            Select dll
+
+        Dim references = From loc In commonAssemblyLocations
+                         Select MetadataReference.CreateFromFile(loc)
         Dim compilation = VisualBasicCompilation.Create($"ExcelVbNetDynamicAssembly{Guid.NewGuid:N}").
             WithOptions(New VisualBasicCompilationOptions(OutputKind.DynamicallyLinkedLibrary)).
             AddReferences(references)
         Return compilation
     End Function
-
-    Private Shared Sub LoadCommonlyUsedLibs()
-        ' XLinq
-        RuntimeHelpers.RunClassConstructor(GetType(System.Xml.Linq.XElement).TypeHandle)
-        ' Newtonsoft.Json
-        RuntimeHelpers.RunClassConstructor(GetType(Newtonsoft.Json.JsonConvert).TypeHandle)
-    End Sub
 
     <MethodImpl(MethodImplOptions.Synchronized)>
     Private Shared Function CompileAssembly(codeSnippet As String, ByRef compilationFailedMessage As String) As Assembly
@@ -91,10 +98,14 @@ Public Class CompilerHelper
         Dim emitResult = s_commonCompilation.Emit(memoryStream)
 
         If emitResult.Success Then
-            Return Assembly.Load(memoryStream.ToArray())
+            memoryStream.Position = 0
+            Dim collectableAssemblyLoadContext As New AssemblyLoadContext($"script {Now:yyyy-MM-dd hh:mm:ss.FFFFFFF}", True)
+            Return collectableAssemblyLoadContext.LoadFromStream(memoryStream)
         Else
-            compilationFailedMessage = String.Join(Environment.NewLine,
-                                                   From diag In emitResult.Diagnostics Select x = diag.ToString)
+            compilationFailedMessage =
+                String.Join(Environment.NewLine,
+                            From diag In emitResult.Diagnostics
+                            Select x = diag.ToString)
         End If
 
         Return Nothing

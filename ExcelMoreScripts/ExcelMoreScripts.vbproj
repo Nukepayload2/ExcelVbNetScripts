@@ -19,7 +19,6 @@
     <PackageReference Include="ExcelDna.IntelliSense" Version="1.7.0-rc6" />
     <PackageReference Include="ExcelDna.Registration" Version="1.7.0-rc6" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.7.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>

@@ -1,9 +1,9 @@
 Imports Microsoft.VisualStudio.TestTools.UnitTesting
 
 <TestClass>
-Public Class UnitTest1
+Public Class CompilationTest
     <TestMethod>
-    Sub TestSub()
+    Sub FullSourceFile()
         Dim vbCodeSnippet As String = "
     Imports System
 
