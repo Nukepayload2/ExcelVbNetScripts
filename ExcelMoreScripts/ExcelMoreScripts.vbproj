@@ -3,7 +3,8 @@
   <PropertyGroup>
     <RootNamespace>ExcelMoreScripts</RootNamespace>
     <TargetFramework>net6.0-windows7.0</TargetFramework>
-    <Version>1.0.0-beta01</Version>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Version>1.0.1-beta02</Version>
     <NoWarn></NoWarn>
   </PropertyGroup>
 
@@ -20,6 +21,27 @@
     <PackageReference Include="ExcelDna.IntelliSense" Version="1.7.0-rc6" />
     <PackageReference Include="ExcelDna.Registration" Version="1.7.0-rc6" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.7.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Strings\Resources.Designer.vb">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Update="Strings\Resources.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Strings\Resources.zh-CN.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.zh-CN.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

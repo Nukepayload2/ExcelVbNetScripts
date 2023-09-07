@@ -44,7 +44,7 @@ Public Class CompilerHelper
         If TypeOf ex Is TargetInvocationException AndAlso ex.InnerException IsNot Nothing Then
             ex = ex.InnerException
         End If
-        Return $"Runtime Error {ex.GetType.FullName}:{Environment.NewLine}{ex.Message}"
+        Return $"{My.Resources.Resources.Error_RuntimeError} {ex.GetType.FullName}:{Environment.NewLine}{ex.Message}"
     End Function
 
     <MethodImpl(MethodImplOptions.Synchronized)>

@@ -28,8 +28,12 @@ Imports System.Numerics"
                        Description:="Optionally populates parameters for this function. Order: paramName1, paramValue1, paramName2, paramValue2, ...")>
         ParamArray parameterNameAndValuePairs As Object()) As Object
 
+        If Not AskOrReuseCanRunCode() Then
+            Return "#BLOCKED!"
+        End If
+
         If parameterNameAndValuePairs.Length Mod 2 = 1 Then
-            Return "ERROR: Incorrect parameter count"
+            Return My.Resources.Resources.Error_IncorrectParameterCount
         End If
 
         Dim splittedCode = TopLevelCodeHelper.SplitTopAndBodyLines(code)
@@ -58,8 +62,12 @@ Imports System.Numerics"
                        Description:="Optionally populates parameters for this function. Order: paramName1, paramValue1, paramName2, paramValue2, ...")>
         ParamArray parameterNameAndValuePairs As Object()) As Object
 
+        If Not AskOrReuseCanRunCode() Then
+            Return "#BLOCKED!"
+        End If
+
         If parameterNameAndValuePairs.Length Mod 2 = 1 Then
-            Return "ERROR: Incorrect parameter count"
+            Return My.Resources.Resources.Error_IncorrectParameterCount
         End If
 
         Dim splittedCode = TopLevelCodeHelper.SplitTopAndBodyLines(code)
