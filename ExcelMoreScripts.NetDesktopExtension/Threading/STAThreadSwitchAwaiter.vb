@@ -11,17 +11,13 @@ Namespace Threading
 
         Public ReadOnly Property IsCompleted As Boolean
             Get
-                Return Volatile.Read(_completed) OrElse
-                    Thread.CurrentThread.GetApartmentState() = ApartmentState.STA
+                Return Volatile.Read(_completed)
             End Get
         End Property
 
         Public Sub GetResult()
             If _exception IsNot Nothing Then
                 Throw _exception
-            End If
-            If Not IsCompleted Then
-                Throw New InvalidOperationException("Unable to switch to a STA thread.")
             End If
         End Sub
 

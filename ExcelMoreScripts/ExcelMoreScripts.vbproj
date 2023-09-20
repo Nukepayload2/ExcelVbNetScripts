@@ -4,7 +4,8 @@
     <RootNamespace>ExcelMoreScripts</RootNamespace>
     <TargetFramework>net6.0-windows7.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <Version>1.0.1-beta02</Version>
+    <UseWPF>true</UseWPF>
+    <Version>1.1.0-beta03</Version>
     <NoWarn></NoWarn>
   </PropertyGroup>
 
@@ -17,10 +18,12 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="ExcelDna.AddIn" Version="1.7.0-rc6" />
     <PackageReference Include="ExcelDna.IntelliSense" Version="1.7.0-rc6" />
     <PackageReference Include="ExcelDna.Registration" Version="1.7.0-rc6" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.7.0" />
+    <PackageReference Include="Nukepayload2.SourceGenerators.MyWpfExtension" Version="1.0.2" />
   </ItemGroup>
   
   <ItemGroup>
@@ -43,5 +46,16 @@
       <LastGenOutput>Resources.zh-CN.Designer.vb</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
+  
+  <ItemGroup>
+    <ProjectReference Include="..\ExcelMoreScripts.NetDesktopExtension\ExcelMoreScripts.NetDesktopExtension.vbproj" />
+  </ItemGroup>
+  
+  <Target Name="RemoveDuplicateAnalyzers" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <FilteredAnalyzer Include="@(Analyzer-&gt;Distinct())" />
+      <Analyzer Remove="@(Analyzer)" />
+      <Analyzer Include="@(FilteredAnalyzer)" />
+    </ItemGroup>
+  </Target>
 </Project>

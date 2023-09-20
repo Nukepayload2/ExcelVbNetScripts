@@ -1,6 +1,6 @@
 ﻿Imports ExcelMoreScripts.NetDesktopExtension.Threading
 
-Friend NotInheritable Class JoinableTaskFactory
+Public Class JoinableTaskFactory
     Public Shared Function SwitchToUIThreadAsync() As STAThreadSwitchAwaitable
         Return New STAThreadSwitchAwaitable()
     End Function

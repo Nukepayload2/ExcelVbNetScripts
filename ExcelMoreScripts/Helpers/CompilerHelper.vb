@@ -33,6 +33,7 @@ Public Class CompilerHelper
                 Dim returnValue = entryPoint.Invoke(Nothing, args)
                 Return returnValue
             Catch ex As Exception
+                HandleRuntimeError(ex, codeSnippet)
                 Return FormatRuntimeException(ex)
             End Try
         Else
@@ -102,10 +103,15 @@ Public Class CompilerHelper
             Dim collectableAssemblyLoadContext As New AssemblyLoadContext($"script {Now:yyyy-MM-dd hh:mm:ss.FFFFFFF}", True)
             Return collectableAssemblyLoadContext.LoadFromStream(memoryStream)
         Else
+            Dim errors = From diag In emitResult.Diagnostics
+                         Where diag.Severity = DiagnosticSeverity.Error
             compilationFailedMessage =
                 String.Join(Environment.NewLine,
-                            From diag In emitResult.Diagnostics
-                            Select x = diag.ToString)
+                            From err In errors Select x = err.ToString)
+
+            Dim firstError = errors.FirstOrDefault
+            Dim errDesc = firstError?.Descriptor
+            HandleCompilationError($"{firstError?.Id}: {errDesc?.Title}", compilationFailedMessage, codeSnippet)
         End If
 
         Return Nothing

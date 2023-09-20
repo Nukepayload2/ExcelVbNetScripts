@@ -1,0 +1,45 @@
+﻿<Window x:Class="ErrorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ExcelMoreScripts"
+        mc:Ignorable="d" d:DataContext="{d:DesignInstance Type=local:ErrorViewModel}"
+        Title="Error Log" Height="450" Width="400">
+    <Grid Margin="2">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Button x:Name="BtnClearError" Margin="2">Clear</Button>
+        <ListBox x:Name="LstErrors" Grid.Row="1" Margin="2" ItemsSource="{Binding Errors, Mode=OneTime}" d:ItemsSource="{d:SampleData ItemCount=5}" 
+             ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate DataType="local:ErrorInformation">
+                    <Grid MaxHeight="200">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{Binding ErrorStage,Mode=OneTime}" Background="DarkRed" Foreground="White" Margin="2" Padding="4"/>
+                        <TextBlock Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" Text="{Binding Title,Mode=OneTime}" Margin="2"/>
+                        <TextBlock Grid.Row="1" Text="{Binding Information}" TextWrapping="Wrap" Grid.ColumnSpan="2" Margin="2"/>
+                        <Button Grid.Row="1" Grid.Column="2" Padding="12,4" VerticalAlignment="Bottom"
+                            Command="{Binding ViewDetails}" CommandParameter="{Binding .}">View Details</Button>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</Window>
