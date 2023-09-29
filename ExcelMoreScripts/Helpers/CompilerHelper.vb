@@ -41,6 +41,19 @@ Public Class CompilerHelper
         End If
     End Function
 
+    Public Shared Sub BeginPreheating()
+        Task.Run(Sub()
+                     Try
+                         CompileAndRunVbCode("Module Program
+Public Function Main() As Object
+Return 0
+End Function
+End Module", "Main", Array.Empty(Of Object))
+                     Catch ex As Exception
+                     End Try
+                 End Sub)
+    End Sub
+
     Public Shared Function FormatRuntimeException(ex As Exception) As String
         If TypeOf ex Is TargetInvocationException AndAlso ex.InnerException IsNot Nothing Then
             ex = ex.InnerException

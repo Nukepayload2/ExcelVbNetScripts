@@ -22,3 +22,21 @@ Public Class ViewErrorDetailsCommand
         Return True
     End Function
 End Class
+
+Public Class DismissErrorCommand
+    Implements ICommand
+
+    Public Shared ReadOnly Property Instance As New DismissErrorCommand
+
+    Public Event CanExecuteChanged As EventHandler Implements ICommand.CanExecuteChanged
+
+    Public Sub Execute(parameter As Object) Implements ICommand.Execute
+        Dim errInfo = TryCast(parameter, ErrorInformation)
+        If errInfo Is Nothing Then Return
+        ErrorViewModel.Instance.Errors.Remove(errInfo)
+    End Sub
+
+    Public Function CanExecute(parameter As Object) As Boolean Implements ICommand.CanExecute
+        Return True
+    End Function
+End Class

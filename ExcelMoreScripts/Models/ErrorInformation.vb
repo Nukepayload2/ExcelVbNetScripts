@@ -15,8 +15,6 @@ Public Class ErrorInformation
     Public ReadOnly Property LongInformation As String
     Public ReadOnly Property Code As String
     Public ReadOnly Property Timestamp As Date = Now
-
-    Public ReadOnly Property ViewDetails As ICommand = ViewErrorDetailsCommand.Instance
 End Class
 
 Public Class ErrorStages
