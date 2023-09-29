@@ -91,6 +91,7 @@ Imports System.Numerics"
                     Try
                         Return Await taskResult
                     Catch ex As Exception
+                        HandleRuntimeError(ex, vbCodeFull)
                         Return CompilerHelper.FormatRuntimeException(ex)
                     End Try
                 Else
