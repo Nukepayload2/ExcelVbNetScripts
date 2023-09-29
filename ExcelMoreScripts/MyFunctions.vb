@@ -42,7 +42,7 @@ Imports System.Numerics"
 
         Dim vbCodeFull As String = $"{splittedCode.topLines}
 {s_defaultImports}
-    Public Module Program
+    Public Module {CompilerHelper.ScriptClassName}
         Public Function Main({String.Join(",", argList.argNameList)}) As Object
 {splittedCode.bodyLines}
         End Function
@@ -76,7 +76,7 @@ Imports System.Numerics"
 
         Dim vbCodeFull As String = $"{splittedCode.topLines}
 {s_defaultImports}
-    Public Module Program
+    Public Module {CompilerHelper.ScriptClassName}
         Public Async Function MainAsync({String.Join(",", argList.argNameList)}) As Task(Of Object)
 {splittedCode.bodyLines}
         End Function

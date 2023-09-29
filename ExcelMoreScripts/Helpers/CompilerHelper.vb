@@ -26,7 +26,7 @@ Public Class CompilerHelper
             Return failMessage
         End If
 
-        Dim entryPoint As MethodInfo = FindMethodInAssembly(cachedAssembly, methodName)
+        Dim entryPoint As MethodInfo = GetScriptMethodInAssembly(cachedAssembly, methodName)
 
         If entryPoint IsNot Nothing Then
             Try
@@ -130,13 +130,11 @@ End Module", "Main", Array.Empty(Of Object))
         Return Nothing
     End Function
 
-    Private Shared Function FindMethodInAssembly(assembly As Assembly, methodName As String) As MethodInfo
-        For Each t In assembly.GetTypes()
-            Dim method = t.GetMethod(methodName)
-            If method IsNot Nothing Then
-                Return method
-            End If
-        Next
+    Public Const ScriptClassName = "Program"
+
+    Private Shared Function GetScriptMethodInAssembly(assembly As Assembly, methodName As String) As MethodInfo
+        Dim t = assembly.GetType(ScriptClassName)
+        Return t?.GetMethod(methodName)
 
         Return Nothing
     End Function
