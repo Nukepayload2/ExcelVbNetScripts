@@ -42,11 +42,12 @@ Imports System.Numerics"
 
         Dim vbCodeFull As String = $"{splittedCode.topLines}
 {s_defaultImports}
-    Public Module {CompilerHelper.ScriptClassName}
-        Public Function Main({String.Join(",", argList.argNameList)}) As Object
+Public Module {CompilerHelper.ScriptClassName}
+    Public Function Main({String.Join(",", argList.argNameList)}) As Object
 {splittedCode.bodyLines}
-        End Function
-    End Module"
+    End Function
+{s_xlTypeHelper}
+End Module"
 
         Dim returnValue = AsyncTaskUtil.RunAsTask(NameOf(RunVbNetFunction), {CObj(code), parameterNameAndValuePairs},
             Function() CompilerHelper.CompileAndRunVbCode(vbCodeFull, "Main", argList.argValueList.ToArray))
@@ -76,11 +77,12 @@ Imports System.Numerics"
 
         Dim vbCodeFull As String = $"{splittedCode.topLines}
 {s_defaultImports}
-    Public Module {CompilerHelper.ScriptClassName}
-        Public Async Function MainAsync({String.Join(",", argList.argNameList)}) As Task(Of Object)
+Public Module {CompilerHelper.ScriptClassName}
+    Public Async Function MainAsync({String.Join(",", argList.argNameList)}) As Task(Of Object)
 {splittedCode.bodyLines}
-        End Function
-    End Module
+    End Function
+{s_xlTypeHelper}
+End Module
 "
 
         Dim returnValue = AsyncTaskUtil.RunTask(NameOf(RunVbNetFunction), {CObj(code), parameterNameAndValuePairs},
@@ -102,4 +104,51 @@ Imports System.Numerics"
         Return returnValue
     End Function
 
+    Private ReadOnly s_xlTypeHelper As String = "    Private s_xlEmptyType As Type
+    Private s_xlErrorType As Type
+
+    Private Function CachedInstanceOf(value As Object, typeName As String, ByRef typeCache As Type) As Boolean
+        If value Is Nothing Then Return False
+        If typeCache Is Nothing Then
+            Dim valType = value.GetType
+            If valType.FullName = typeName Then
+                typeCache = valType
+                Return True
+            End If
+            Return False
+        End If
+        Return typeCache.IsInstanceOfType(value)
+    End Function
+
+    Private Function IsXlEmpty(value As Object) As Boolean
+        Return CachedInstanceOf(value, ""ExcelDna.Integration.ExcelEmpty"", s_xlEmptyType)
+    End Function
+
+    Private Function IsXlError(value As Object) As Boolean
+        Return CachedInstanceOf(value, ""ExcelDna.Integration.ExcelError"", s_xlErrorType)
+    End Function"
+
+    Private s_xlEmptyType As Type
+    Private s_xlErrorType As Type
+
+    Private Function CachedInstanceOf(value As Object, typeName As String, ByRef typeCache As Type) As Boolean
+        If value Is Nothing Then Return False
+        If typeCache Is Nothing Then
+            Dim valType = value.GetType
+            If valType.FullName = typeName Then
+                typeCache = valType
+                Return True
+            End If
+            Return False
+        End If
+        Return typeCache.IsInstanceOfType(value)
+    End Function
+
+    Private Function IsXlEmpty(value As Object) As Boolean
+        Return CachedInstanceOf(value, "ExcelDna.Integration.ExcelEmpty", s_xlEmptyType)
+    End Function
+
+    Private Function IsXlError(value As Object) As Boolean
+        Return CachedInstanceOf(value, "ExcelDna.Integration.ExcelError", s_xlErrorType)
+    End Function
 End Module
